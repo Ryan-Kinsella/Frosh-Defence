@@ -1,20 +1,18 @@
 #include "throwProjectile.h"
 #include <math.h>
 
-//creates a throwProjectile object
 throwProjectile::throwProjectile(int ind, int _damage,
-		sf::Vector2f frecPosition, weak_ptr<Frosh> froshToFireAt) :
-		index(ind), damage(_damage), projectilePosition(frecPosition), froshTarget(
-				froshToFireAt) {
-	speed = 8.0f;
+		sf::Vector2f frecPosition, weak_ptr<Frosh> froshToFireAt) : index(ind),
+		damage(_damage), projectilePosition(frecPosition), froshTarget(froshToFireAt) 
+{
+	speed = 8.0f; //projectile speed is currently set at a static value of 8. 
 	if (auto frosh = froshToFireAt.lock()) {
 		if (frosh->getPixelSpeed() > speed - 3.5) {
 			speed = frosh->getPixelSpeed() + 3.5;
 		}
 	}
 	projectileShape = sf::RectangleShape(sf::Vector2f(30.0f, 30.0f));
-	projectileShape.setSize(sf::Vector2f(30.0f, 30.0f)); //size of projectile
-
+	projectileShape.setSize(sf::Vector2f(30.0f, 30.0f)); //30 will be the size of projectile
 	projectileShape.setPosition(frecPosition);
 	if (!projectileTexture.loadFromFile(throwProjImage)) {
 		std::cerr << "Error finding image\n";
@@ -25,15 +23,12 @@ throwProjectile::throwProjectile(int ind, int _damage,
 	projectileCenter = sf::Vector2f(frecPosition.x + 30.0f / 2,
 			frecPosition.y + 30.0f / 2);
 }
-
-throwProjectile::~throwProjectile() {
-}
+throwProjectile::~throwProjectile() {}
 
 void throwProjectile::drawProjectile(sf::RenderWindow* _window) {
 	_window->draw(projectileShape);
 }
 
-//gets a vector of length 1, to be multipled by a speed
 sf::Vector2f throwProjectile::normalize(sf::Vector2f v) {
 	float len = float(sqrt((v.x * v.x) + (v.y * v.y)));
 	if (len != 0) {
@@ -43,7 +38,7 @@ sf::Vector2f throwProjectile::normalize(sf::Vector2f v) {
 	return v;
 }
 
-//draws the projectile to the window
+//draws the projectile to the window, and updates the positional coordinates
 void throwProjectile::moveObjectTowardsFrosh(sf::Vector2f froshPos) {
 	sf::Vector2f movePos = normalize(froshPos - projectilePosition);
 	projectileShape.move(movePos * getSpeed()); //using the x,y positions, moves at a percentage towards the frosh object
@@ -51,7 +46,7 @@ void throwProjectile::moveObjectTowardsFrosh(sf::Vector2f froshPos) {
 	projectileCenter = projectileCenter + movePos * getSpeed();
 }
 
-// returns distance between two points
+//returns distance between two points, used in projectileFroshCollision
 float throwProjectile::DistanceFromFrosh(sf::Vector2f frosh) {
 	//use abs to prevent a negative distance
 	float x = abs(
@@ -62,18 +57,13 @@ float throwProjectile::DistanceFromFrosh(sf::Vector2f frosh) {
 					* (frosh.y - projectilePosition.y));
 	return (int) (powf(x + y, 0.5)); //square root ( x^2+y^2 )
 }
-bool throwProjectile::projectileFroshCollision(sf::Vector2f frosh) // simple collision detection between two circles
-		{
+bool throwProjectile::projectileFroshCollision(sf::Vector2f frosh) { // simple collision detection between two circles
 	return DistanceFromFrosh(frosh) < 20;
-	//return DistanceFromFrosh(frosh) < projectileShape.getSize().x || DistanceFromFrosh(frosh) < projectileShape.getSize().y;// if dist < frec range we have a collision
-} //will always do for < 10
+}
 
 //Accessors:
 weak_ptr<Frosh> throwProjectile::getFroshTarget() {
 	return froshTarget;
-}
-string throwProjectile::getThrowProjImage() {
-	return throwProjImage;
 }
 sf::Vector2f throwProjectile::getThrowProjectilePosition() {
 	return projectilePosition;

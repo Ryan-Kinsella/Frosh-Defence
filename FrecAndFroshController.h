@@ -10,7 +10,7 @@
 #include <fstream>
 #include <cassert>
 #include <functional>
-
+#include <math.h>
 #include "GameState.h"
 #include "throwProjectile.h"
 #include "Frec.h"
@@ -26,24 +26,21 @@ public:
 			FroshController* froshController, vector<Frec*>* allFrecs,
 			vector<shared_ptr<Frosh>>* allFrosh);
 	~FrecAndFroshController();
-	//throwFrec Object
-	void addThrowFrecToList(sf::Vector2f position, int index); //using string
-	void deleteThrowFrecAtIndex(int index);
-	//Throw Objects
+	//Throw/Projectile Objects
 	void addThrowObjectToList(int index, int damage, sf::Vector2f frecPosition,
 			weak_ptr<Frosh> froshPtr);
 	void drawAllThrowObjectsOnGrid(sf::RenderWindow* theWindow);
 	void deleteProjectile(throwProjectile* projectile);
 	void deleteThrowObjectAtIndex(int index);
 	void updateProjectiles();
+	
 	void updateFrecFroshRange();
+	void update();
+	void render();
 
 	//used for testing
 	void addFroshObjectToList(sf::Vector2f _position, sf::Vector2f _size,
-			sf::Texture* _texture, int type, double modifier);
-
-	void update();
-	void render();
+		sf::Texture* _texture, int type, double modifier);
 private:
 	sf::RenderWindow* window;
 	GameState* gameState;
@@ -53,17 +50,13 @@ private:
 	vector<Frec*>* allThrowFrecs;
 	vector<Frec*> allThrowFrecsInRangeOfFrosh;
 
-	// This is a reference to the true frosh vector. Duplication
-	// should always be as a weak pointer, to allow for projectiles
-	// to properly delete themselves once a target frosh is removed.
+	//This is a reference to the true frosh vector. Duplication
+	//should always be as a weak pointer, to allow for projectiles
+	//to properly delete themselves once a target frosh is removed.
 	vector<shared_ptr<Frosh>>* allFrosh;
 	vector<weak_ptr<Frosh>> allFroshInRangeOfFrecs;
 
 	bool collisionDetected(Frec*, weak_ptr<Frosh>);
 
-	//vector<unique_ptr<Frec>> allTSlamFrecs;
-//vector<unique_ptr<Frec>> allSkipFrecs;
-	//vector<unique_ptr<Frec>> allSlamObjects;
-//vector<unique_ptr<Frec>> allSkipObjects;
 };
 
